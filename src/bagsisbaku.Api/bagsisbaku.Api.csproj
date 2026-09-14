@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\bagsisbaku.Application\bagsisbaku.Application.csproj" />
+    <ProjectReference Include="..\bagsisbaku.Infrastructure\bagsisbaku.Infrastructure.csproj" />
+    <ProjectReference Include="..\bagsisbaku.Contracts\bagsisbaku.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>5cfa0a92-a1e7-4912-b269-679ae2165746</UserSecretsId>
+  </PropertyGroup>
+
+</Project>

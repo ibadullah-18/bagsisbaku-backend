@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/bagsisbaku.Api/bagsisbaku.Api.csproj" />
+    <Project Path="src/bagsisbaku.Application/bagsisbaku.Application.csproj" />
+    <Project Path="src/bagsisbaku.Contracts/bagsisbaku.Contracts.csproj" />
+    <Project Path="src/bagsisbaku.Domain/bagsisbaku.Domain.csproj" />
+    <Project Path="src/bagsisbaku.Infrastructure/bagsisbaku.Infrastructure.csproj" />
+    <Project Path="src/bagsisbaku.Worker/bagsisbaku.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/bagsisbaku.Application.UnitTests/bagsisbaku.Application.UnitTests.csproj" />
+    <Project Path="tests/bagsisbaku.ArchitectureTests/bagsisbaku.ArchitectureTests.csproj" />
+    <Project Path="tests/bagsisbaku.Domain.UnitTests/bagsisbaku.Domain.UnitTests.csproj" />
+    <Project Path="tests/bagsisbaku.IntegrationTests/bagsisbaku.IntegrationTests.csproj" />
+  </Folder>
+</Solution>
