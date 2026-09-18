@@ -14,7 +14,7 @@ using Xunit;
 
 namespace bagsisbaku.IntegrationTests;
 
-public sealed class CatalogApiFixture : IAsyncLifetime
+public sealed partial class CatalogApiFixture : IAsyncLifetime
 {
     private readonly MsSqlContainer _sqlServer =
         new MsSqlBuilder(
@@ -153,10 +153,10 @@ public sealed class CatalogApiFixture : IAsyncLifetime
         var orderViewerToken =
             accessTokenGenerator.Generate(
                 new AccessTokenUser(
-                    customer.Id,
-                    customer.Email!,
-                    customer.FullName,
-                    ["admin"],
+                    customerAdministrator.Id,
+                    customerAdministrator.Email!,
+                    customerAdministrator.FullName,
+                    [SystemRoles.Admin],
                     [
                         PermissionNames.Orders.View
                     ]));
@@ -167,10 +167,10 @@ public sealed class CatalogApiFixture : IAsyncLifetime
         var orderManagerToken =
             accessTokenGenerator.Generate(
                 new AccessTokenUser(
-                    customer.Id,
-                    customer.Email!,
-                    customer.FullName,
-                    ["admin"],
+                    customerAdministrator.Id,
+                    customerAdministrator.Email!,
+                    customerAdministrator.FullName,
+                    [SystemRoles.Admin],
                     [
                         PermissionNames.Orders.View,
                         PermissionNames.Orders.UpdateStatus

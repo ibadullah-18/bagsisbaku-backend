@@ -2,6 +2,9 @@ using bagsisbaku.Api.Authentication;
 using bagsisbaku.Api.OpenApi;
 using bagsisbaku.Application;
 using bagsisbaku.Infrastructure;
+using bagsisbaku.Infrastructure.Promotions;
+using bagsisbaku.Infrastructure.Promotions.Administration;
+using bagsisbaku.Infrastructure.Favorites;
 using bagsisbaku.Infrastructure.Orders;
 using bagsisbaku.Infrastructure.Orders.Administration;
 using bagsisbaku.Infrastructure.Baskets;
@@ -124,11 +127,17 @@ builder.Services.AddAdminCustomers();
 
 builder.Services.AddBaskets();
 
+builder.Services.AddFavorites();
+
 builder.Services.AddCheckout();
 
 builder.Services.AddCustomerOrders();
 
 builder.Services.AddAdminOrders();
+
+builder.Services.AddAdminPromotions();
+
+builder.Services.AddPromoCodeValidation();
 
 var app = builder.Build();
 

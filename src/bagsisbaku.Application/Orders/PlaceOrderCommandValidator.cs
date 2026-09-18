@@ -47,6 +47,8 @@ public sealed class PlaceOrderCommandValidator
                     .Empty()
                     .WithMessage(
                         "Ünvana çatdırılmada ayrıca pickup telefonu göndərilməməlidir.");
+
+        ConfigurePromoCodeValidation();
             });
 
         When(
@@ -83,4 +85,17 @@ public sealed class PlaceOrderCommandValidator
                         "Telefon nömrəsi 32 simvoldan çox ola bilməz.");
             });
     }
-}
+
+    private void ConfigurePromoCodeValidation()
+    {
+        RuleFor(command => command.PromoCode)
+            .MaximumLength(
+                Promotions.PromoCodeNormalizer
+                    .MaximumCodeLength)
+            .When(
+                command =>
+                    !string.IsNullOrWhiteSpace(
+                        command.PromoCode))
+            .WithMessage(
+                "Promo kod maksimum 50 simvol ola bilər.");
+    }}

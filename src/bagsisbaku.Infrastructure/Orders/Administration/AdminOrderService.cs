@@ -6,6 +6,7 @@ using bagsisbaku.Application.Orders.Administration;
 using bagsisbaku.Domain.Common;
 using bagsisbaku.Domain.Localization;
 using bagsisbaku.Domain.Orders;
+using bagsisbaku.Infrastructure.Orders;
 using bagsisbaku.Infrastructure.Persistence;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -473,6 +474,13 @@ internal sealed class AdminOrderService(
                     normalizedNote ??
                     "Admin tərəfindən ləğv edildi.",
                     changedAtUtc);
+
+                await OrderPromotionReleaseHelper
+                    .ReleaseAsync(
+                        dbContext,
+                        order,
+                        changedAtUtc,
+                        cancellationToken);
 
                 return Result.Success();
 

@@ -7,7 +7,8 @@ public sealed record PlaceOrderCommand(
     Guid? CustomerAddressId,
     string? PickupRecipientFullName,
     string? PickupPhoneNumber,
-    string? CustomerNote);
+    string? CustomerNote,
+    string? PromoCode = null);
 
 public sealed record PlacedOrderModel(
     Guid Id,
@@ -27,6 +28,9 @@ public sealed record PlacedOrderModel(
     string? CustomerNote,
     decimal Subtotal,
     decimal DiscountAmount,
+    string? PromoCode,
+    decimal PromoDiscountAmount,
+    decimal TotalDiscountAmount,
     decimal DeliveryFee,
     decimal Total,
     DateTimeOffset PlacedAtUtc,

@@ -25,4 +25,6 @@ public sealed record PlaceOrderRequest
 
     [MaxLength(1000)]
     public string? CustomerNote { get; init; }
+
+    public string? PromoCode { get; init; }
 }

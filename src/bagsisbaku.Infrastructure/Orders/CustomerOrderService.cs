@@ -282,10 +282,20 @@ internal sealed class CustomerOrderService(
                             .IncreaseStock(entry.Value);
                     }
 
+                    var cancelledAtUtc =
+                        clock.UtcNow;
+
                     order.Cancel(
                         customerId,
                         command.Reason.Trim(),
-                        clock.UtcNow);
+                        cancelledAtUtc);
+
+                    await OrderPromotionReleaseHelper
+                        .ReleaseAsync(
+                            dbContext,
+                            order,
+                            cancelledAtUtc,
+                            cancellationToken);
 
                     await dbContext.SaveChangesAsync(
                         cancellationToken);

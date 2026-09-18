@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace bagsisbaku.Infrastructure.Orders;
 
-internal sealed class CheckoutService(
+internal sealed partial class CheckoutService(
     ApplicationDbContext dbContext,
     ICurrentUser currentUser,
     IClock clock,
@@ -364,6 +364,8 @@ internal sealed class CheckoutService(
                 new List<OrderItemSnapshot>(
                     basketItems.Length);
 
+            decimal discountedItemsTotal = 0m;
+
             foreach (var basketItem in basketItems)
             {
                 if (!variantById.TryGetValue(
@@ -427,6 +429,10 @@ internal sealed class CheckoutService(
                     product.DiscountPrice ??
                     product.Price;
 
+                discountedItemsTotal +=
+                    unitPrice *
+                    basketItem.Quantity;
+
                 var productName =
                     productNameById.GetValueOrDefault(
                         product.Id,
@@ -476,6 +482,30 @@ internal sealed class CheckoutService(
 
             var utcNow = clock.UtcNow;
 
+            discountedItemsTotal =
+                decimal.Round(
+                    discountedItemsTotal,
+                    2,
+                    MidpointRounding.AwayFromZero);
+
+            var promotionResult =
+                await ValidatePromotionAsync(
+                    dbContext,
+                    userId,
+                    command.PromoCode,
+                    discountedItemsTotal,
+                    utcNow,
+                    cancellationToken);
+
+            if (promotionResult.IsFailure)
+            {
+                return Result.Failure<PlacedOrderModel>(
+                    promotionResult.Error);
+            }
+
+            var promotion =
+                promotionResult.Value;
+
             var order =
                 Order.Create(
                     userId,
@@ -484,11 +514,22 @@ internal sealed class CheckoutService(
                     PaymentMethod.Cash,
                     delivery,
                     command.CustomerNote,
+                    promotion?.Snapshot,
                     deliveryFee,
                     utcNow,
                     snapshots);
 
             dbContext.Orders.Add(order);
+
+            if (promotion is not null)
+            {
+                RegisterPromotionUsage(
+                    dbContext,
+                    promotion,
+                    userId,
+                    order.Id,
+                    utcNow);
+            }
 
             basket.Clear();
 

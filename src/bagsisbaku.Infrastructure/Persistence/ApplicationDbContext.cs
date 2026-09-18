@@ -2,6 +2,8 @@ using bagsisbaku.Application.Abstractions.Persistence;
 using bagsisbaku.Domain.Baskets;
 using bagsisbaku.Domain.Catalog;
 using bagsisbaku.Domain.Orders;
+using bagsisbaku.Domain.Promotions;
+using bagsisbaku.Domain.Store;
 using bagsisbaku.Domain.Customers;
 using bagsisbaku.Domain.Favorites;
 using bagsisbaku.Infrastructure.Identity;
@@ -58,6 +60,18 @@ public sealed class ApplicationDbContext(
     public DbSet<Favorite> Favorites =>
         Set<Favorite>();
 
+    public DbSet<PromoCode> PromoCodes =>
+        Set<PromoCode>();
+
+    public DbSet<PromoCodeUsage> PromoCodeUsages =>
+        Set<PromoCodeUsage>();
+
+    public DbSet<StoreSettings> StoreSettings =>
+        Set<StoreSettings>();
+
+    public DbSet<StoreSettingsTranslation>
+        StoreSettingsTranslations =>
+            Set<StoreSettingsTranslation>();
     public DbSet<RefreshToken> RefreshTokens =>
         Set<RefreshToken>();
 

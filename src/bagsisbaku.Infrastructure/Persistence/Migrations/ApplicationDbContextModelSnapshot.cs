@@ -854,6 +854,19 @@ namespace bagsisbaku.Infrastructure.Persistence.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
 
+                    b.Property<string>("PromoCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<Guid?>("PromoCodeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("PromoDiscountAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
                     b.Property<string>("RecipientFullName")
                         .IsRequired()
                         .HasMaxLength(160)
@@ -886,6 +899,9 @@ namespace bagsisbaku.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("OrderNumber")
                         .IsUnique();
+
+                    b.HasIndex("PromoCodeId")
+                        .HasDatabaseName("IX_orders_PromoCodeId");
 
                     b.HasIndex("Status", "PlacedAtUtc");
 
@@ -1001,6 +1017,301 @@ namespace bagsisbaku.Infrastructure.Persistence.Migrations
                     b.HasIndex("OrderId", "ChangedAtUtc");
 
                     b.ToTable("order_status_history", "sales");
+                });
+
+            modelBuilder.Entity("bagsisbaku.Domain.Promotions.PromoCode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasPrecision(0)
+                        .HasColumnType("datetimeoffset(0)");
+
+                    b.Property<int>("DiscountType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("DiscountValue")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTimeOffset>("EndsAtUtc")
+                        .HasPrecision(0)
+                        .HasColumnType("datetimeoffset(0)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<decimal?>("MaximumDiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MinimumOrderAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<int?>("PerCustomerUsageLimit")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset>("StartsAtUtc")
+                        .HasPrecision(0)
+                        .HasColumnType("datetimeoffset(0)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasPrecision(0)
+                        .HasColumnType("datetimeoffset(0)");
+
+                    b.Property<int>("UsageCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int?>("UsageLimit")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("ux_promo_codes_code");
+
+                    b.HasIndex("IsActive", "StartsAtUtc", "EndsAtUtc")
+                        .HasDatabaseName("ix_promo_codes_active_schedule");
+
+                    b.ToTable("promo_codes", "promotions");
+                });
+
+            modelBuilder.Entity("bagsisbaku.Domain.Promotions.PromoCodeUsage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PromoCodeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ReleasedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("UsedAtUtc")
+                        .HasPrecision(0)
+                        .HasColumnType("datetimeoffset(0)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_promo_code_usages_order");
+
+                    b.HasIndex("PromoCodeId", "UsedAtUtc")
+                        .HasDatabaseName("ix_promo_code_usages_promo_date");
+
+                    b.HasIndex("UserId", "PromoCodeId")
+                        .HasDatabaseName("ix_promo_code_usages_user_promo");
+
+                    b.HasIndex("PromoCodeId", "UserId", "ReleasedAtUtc")
+                        .HasDatabaseName("IX_promo_code_usages_PromoCodeId_UserId_ReleasedAtUtc");
+
+                    b.ToTable("promo_code_usages", "promotions");
+                });
+
+            modelBuilder.Entity("bagsisbaku.Domain.Store.StoreSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AboutText")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasPrecision(0)
+                        .HasColumnType("datetimeoffset(0)");
+
+                    b.Property<string>("DeliveryInformation")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("InstagramUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<decimal>("Latitude")
+                        .HasPrecision(9, 6)
+                        .HasColumnType("decimal(9,6)");
+
+                    b.Property<string>("LogoPublicId")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("LogoUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<decimal>("Longitude")
+                        .HasPrecision(9, 6)
+                        .HasColumnType("decimal(9,6)");
+
+                    b.Property<string>("MapUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<string>("PrimaryPhone")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("ReturnPolicy")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("StoreName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("TikTokUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasPrecision(0)
+                        .HasColumnType("datetimeoffset(0)");
+
+                    b.Property<string>("WhatsAppPhone")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("WorkingHours")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StoreName")
+                        .IsUnique()
+                        .HasDatabaseName("ux_store_settings_store_name");
+
+                    b.ToTable("store_settings", "store");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b4616c76-8748-447a-b154-e4d3fd5f8e72"),
+                            AboutText = "bagsisbaku çanta və ayaqqabı mağazasıdır.",
+                            Address = "Bakı, Azərbaycan",
+                            CreatedAtUtc = new DateTimeOffset(new DateTime(2026, 9, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeliveryInformation = "Çatdırılma məlumatları sifariş zamanı dəqiqləşdirilir.",
+                            Email = "bagsisbaku2026@gmail.com",
+                            InstagramUrl = "https://www.instagram.com/bagsisbaku",
+                            Latitude = 40.376504m,
+                            Longitude = 49.841709m,
+                            PrimaryPhone = "+994519723718",
+                            ReturnPolicy = "Qaytarma və dəyişdirmə şərtləri mağaza ilə razılaşdırılır.",
+                            StoreName = "bagsisbaku",
+                            WhatsAppPhone = "+994519723718",
+                            WorkingHours = "Hər gün 10:00–21:00"
+                        });
+                });
+
+            modelBuilder.Entity("bagsisbaku.Domain.Store.StoreSettingsTranslation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AboutText")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasPrecision(0)
+                        .HasColumnType("datetimeoffset(0)");
+
+                    b.Property<string>("DeliveryInformation")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("Language")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReturnPolicy")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<Guid>("StoreSettingsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasPrecision(0)
+                        .HasColumnType("datetimeoffset(0)");
+
+                    b.Property<string>("WorkingHours")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StoreSettingsId", "Language")
+                        .IsUnique()
+                        .HasDatabaseName("ux_store_setting_translations_settings_language");
+
+                    b.ToTable("store_setting_translations", "store");
                 });
 
             modelBuilder.Entity("bagsisbaku.Infrastructure.Identity.AppRole", b =>
@@ -1374,6 +1685,11 @@ namespace bagsisbaku.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("bagsisbaku.Domain.Orders.Order", b =>
                 {
+                    b.HasOne("bagsisbaku.Domain.Promotions.PromoCode", null)
+                        .WithMany()
+                        .HasForeignKey("PromoCodeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("bagsisbaku.Infrastructure.Identity.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -1395,6 +1711,36 @@ namespace bagsisbaku.Infrastructure.Persistence.Migrations
                     b.HasOne("bagsisbaku.Domain.Orders.Order", null)
                         .WithMany("StatusHistory")
                         .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("bagsisbaku.Domain.Promotions.PromoCodeUsage", b =>
+                {
+                    b.HasOne("bagsisbaku.Domain.Orders.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("bagsisbaku.Domain.Promotions.PromoCode", null)
+                        .WithMany()
+                        .HasForeignKey("PromoCodeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("bagsisbaku.Infrastructure.Identity.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("bagsisbaku.Domain.Store.StoreSettingsTranslation", b =>
+                {
+                    b.HasOne("bagsisbaku.Domain.Store.StoreSettings", null)
+                        .WithMany()
+                        .HasForeignKey("StoreSettingsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

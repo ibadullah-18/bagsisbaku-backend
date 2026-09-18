@@ -21,6 +21,7 @@ public sealed class Order : AuditableEntity
         PaymentMethod paymentMethod,
         OrderDeliverySnapshot delivery,
         string? customerNote,
+        OrderPromotionSnapshot? promotion,
         decimal deliveryFee,
         DateTimeOffset placedAtUtc,
         IReadOnlyCollection<OrderItemSnapshot> items)
@@ -106,6 +107,15 @@ public sealed class Order : AuditableEntity
                 nameof(CustomerNote),
                 1000);
 
+        PromoCodeId =
+            promotion?.PromoCodeId;
+
+        PromoCode =
+            promotion?.Code;
+
+        PromoDiscountAmount =
+            promotion?.DiscountAmount ?? 0;
+
         DeliveryFee = deliveryFee;
         PlacedAtUtc = placedAtUtc;
         Status = OrderStatus.Pending;
@@ -126,9 +136,20 @@ public sealed class Order : AuditableEntity
             _items.Sum(
                 item => item.LineDiscountAmount);
 
-        Total =
+        var discountedItemsTotal =
             _items.Sum(
-                item => item.LineTotal) +
+                item => item.LineTotal);
+
+        if (PromoDiscountAmount >
+            discountedItemsTotal)
+        {
+            throw new DomainException(
+                "Promo kod endirimi məhsulların yekun məbləğindən böyük ola bilməz.");
+        }
+
+        Total =
+            discountedItemsTotal -
+            PromoDiscountAmount +
             DeliveryFee;
 
         AddStatusHistory(
@@ -177,6 +198,20 @@ public sealed class Order : AuditableEntity
     public decimal Subtotal { get; private set; }
 
     public decimal DiscountAmount { get; private set; }
+
+    public Guid? PromoCodeId { get; private set; }
+
+    public string? PromoCode { get; private set; }
+
+    public decimal PromoDiscountAmount
+    {
+        get;
+        private set;
+    }
+
+    public decimal TotalDiscountAmount =>
+        DiscountAmount +
+        PromoDiscountAmount;
 
     public decimal DeliveryFee { get; private set; }
 
@@ -233,6 +268,30 @@ public sealed class Order : AuditableEntity
         DateTimeOffset placedAtUtc,
         IReadOnlyCollection<OrderItemSnapshot> items)
     {
+        return Create(
+            userId,
+            orderNumber,
+            deliveryType,
+            paymentMethod,
+            delivery,
+            customerNote,
+            promotion: null,
+            deliveryFee,
+            placedAtUtc,
+            items);
+    }
+    public static Order Create(
+        Guid userId,
+        string orderNumber,
+        DeliveryType deliveryType,
+        PaymentMethod paymentMethod,
+        OrderDeliverySnapshot delivery,
+        string? customerNote,
+        OrderPromotionSnapshot? promotion,
+        decimal deliveryFee,
+        DateTimeOffset placedAtUtc,
+        IReadOnlyCollection<OrderItemSnapshot> items)
+    {
         return new Order(
             Guid.NewGuid(),
             userId,
@@ -241,6 +300,7 @@ public sealed class Order : AuditableEntity
             paymentMethod,
             delivery,
             customerNote,
+            promotion,
             deliveryFee,
             placedAtUtc,
             items);

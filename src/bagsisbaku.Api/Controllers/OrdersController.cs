@@ -47,7 +47,8 @@ public sealed class OrdersController(
                 request.CustomerAddressId,
                 request.PickupRecipientFullName,
                 request.PickupPhoneNumber,
-                request.CustomerNote);
+                request.CustomerNote,
+                request.PromoCode);
 
         var result =
             await checkoutService.PlaceOrderAsync(
@@ -90,6 +91,9 @@ public sealed class OrdersController(
             order.CustomerNote,
             order.Subtotal,
             order.DiscountAmount,
+            order.PromoCode,
+            order.PromoDiscountAmount,
+            order.TotalDiscountAmount,
             order.DeliveryFee,
             order.Total,
             order.PlacedAtUtc,
