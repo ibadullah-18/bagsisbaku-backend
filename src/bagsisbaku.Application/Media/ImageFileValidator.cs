@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using bagsisbaku.Application.Common.Results;
 
 namespace bagsisbaku.Application.Media;

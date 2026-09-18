@@ -16,6 +16,7 @@ using bagsisbaku.Infrastructure.Authorization;
 using bagsisbaku.Infrastructure.Email;
 using bagsisbaku.Infrastructure.Identity;
 using bagsisbaku.Infrastructure.Storage;
+using bagsisbaku.Infrastructure.Store;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -138,6 +139,8 @@ builder.Services.AddAdminOrders();
 builder.Services.AddAdminPromotions();
 
 builder.Services.AddPromoCodeValidation();
+
+builder.Services.AddStoreSettings();
 
 var app = builder.Build();
 

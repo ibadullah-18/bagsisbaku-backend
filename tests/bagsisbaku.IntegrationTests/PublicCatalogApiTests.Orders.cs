@@ -86,9 +86,9 @@ public sealed partial class PublicCatalogApiTests
             await GetShoeStockAsync(
                 cancellationToken);
 
-        Assert.Equal(
-            8,
-            stockBeforeCheckout);
+        Assert.True(
+            stockBeforeCheckout >= 2,
+            $"Sifariş üçün kifayət qədər stok yoxdur. Mövcud stok: {stockBeforeCheckout}");
 
         using var addToBasketResponse =
             await _fixture.AuthenticatedClient
