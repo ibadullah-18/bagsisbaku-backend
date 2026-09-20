@@ -6,6 +6,8 @@ using bagsisbaku.Domain.Promotions;
 using bagsisbaku.Domain.Store;
 using bagsisbaku.Domain.Customers;
 using bagsisbaku.Domain.Favorites;
+using bagsisbaku.Domain.Engagement;
+using bagsisbaku.Domain.Home;
 using bagsisbaku.Infrastructure.Identity;
 using bagsisbaku.Infrastructure.Persistence.Configurations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -75,6 +77,17 @@ public sealed class ApplicationDbContext(
     public DbSet<RefreshToken> RefreshTokens =>
         Set<RefreshToken>();
 
+    public DbSet<HomeSection> HomeSections =>
+        Set<HomeSection>();
+
+    public DbSet<HomeSectionTranslation>
+        HomeSectionTranslations =>
+            Set<HomeSectionTranslation>();
+    public DbSet<WhatsAppProductInquiry>
+        WhatsAppProductInquiries =>
+            Set<WhatsAppProductInquiry>();
+    public DbSet<SiteVisit> SiteVisits =>
+        Set<SiteVisit>();
     public DbSet<Order> Orders =>
         Set<Order>();
 

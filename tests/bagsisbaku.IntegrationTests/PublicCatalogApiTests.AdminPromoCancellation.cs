@@ -160,7 +160,10 @@ public sealed partial class PublicCatalogApiTests
                 },
                 cancellationToken);
 
-        cancelResponse.EnsureSuccessStatusCode();
+        Assert.True(
+            cancelResponse.IsSuccessStatusCode,
+            await cancelResponse.Content.ReadAsStringAsync(
+                cancellationToken));
 
         var cancelledOrder =
             await cancelResponse.Content

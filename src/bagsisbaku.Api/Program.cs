@@ -142,6 +142,20 @@ builder.Services.AddPromoCodeValidation();
 
 builder.Services.AddStoreSettings();
 
+builder.Services.AddScoped<bagsisbaku.Application.Dashboard.IAdminDashboardQuery, bagsisbaku.Infrastructure.Dashboard.AdminDashboardQuery>();
+
+builder.Services.AddScoped<bagsisbaku.Application.Home.IAdminHomeSectionService, bagsisbaku.Infrastructure.Home.AdminHomeSectionService>();
+
+builder.Services.AddScoped<bagsisbaku.Application.Home.IHomeSectionPublicationService, bagsisbaku.Infrastructure.Home.HomeSectionPublicationService>();
+
+builder.Services.AddScoped<bagsisbaku.Application.Home.IPublicHomeSectionQuery, bagsisbaku.Infrastructure.Home.PublicHomeSectionQuery>();
+
+builder.Services.AddScoped<bagsisbaku.Application.Home.IAdminHomeSectionEditor, bagsisbaku.Infrastructure.Home.AdminHomeSectionEditor>();
+
+builder.Services.AddScoped<bagsisbaku.Application.Engagement.IWhatsAppProductInquiryService, bagsisbaku.Infrastructure.Engagement.WhatsAppProductInquiryService>();
+
+builder.Services.AddScoped<bagsisbaku.Application.Engagement.ISiteVisitService, bagsisbaku.Infrastructure.Engagement.SiteVisitService>();
+
 var app = builder.Build();
 
 if (identityBootstrapSettings.Enabled)

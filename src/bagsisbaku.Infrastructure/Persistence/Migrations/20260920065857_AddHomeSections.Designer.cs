@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using bagsisbaku.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using bagsisbaku.Infrastructure.Persistence;
 namespace bagsisbaku.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260920065857_AddHomeSections")]
+    partial class AddHomeSections
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -738,64 +741,6 @@ namespace bagsisbaku.Infrastructure.Persistence.Migrations
                         .HasFilter("[IsDefault] = 1");
 
                     b.ToTable("customer_addresses", "customers");
-                });
-
-            modelBuilder.Entity("bagsisbaku.Domain.Engagement.SiteVisit", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedAtUtc")
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)");
-
-                    b.Property<string>("PagePath")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)");
-
-                    b.Property<Guid>("VisitorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedAtUtc", "PagePath");
-
-                    b.HasIndex("VisitorId", "CreatedAtUtc");
-
-                    b.ToTable("site_visits", "engagement");
-                });
-
-            modelBuilder.Entity("bagsisbaku.Domain.Engagement.WhatsAppProductInquiry", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedAtUtc")
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)");
-
-                    b.Property<string>("ProductCode")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId", "CreatedAtUtc");
-
-                    b.ToTable("whatsapp_product_inquiries", "engagement");
                 });
 
             modelBuilder.Entity("bagsisbaku.Domain.Favorites.Favorite", b =>

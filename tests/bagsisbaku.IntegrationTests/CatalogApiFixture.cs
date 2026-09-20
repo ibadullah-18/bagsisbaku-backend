@@ -55,6 +55,16 @@ public sealed partial class CatalogApiFixture : IAsyncLifetime
         get;
         private set;
     } = string.Empty;
+    public string DashboardViewerAccessToken
+    {
+        get;
+        private set;
+    } = string.Empty;
+    public string ContentManagerAccessToken
+    {
+        get;
+        private set;
+    } = string.Empty;
     public string OrderViewerAccessToken
     {
         get;
@@ -150,6 +160,20 @@ public sealed partial class CatalogApiFixture : IAsyncLifetime
                     "Bearer",
                     accessToken.Token);
 
+        var contentManagerToken =
+            accessTokenGenerator.Generate(
+                new AccessTokenUser(
+                    customerAdministrator.Id,
+                    customerAdministrator.Email!,
+                    customerAdministrator.FullName,
+                    [SystemRoles.Admin],
+                    [
+                        PermissionNames.Content.View,
+                        PermissionNames.Content.Manage
+                    ]));
+
+        ContentManagerAccessToken =
+            contentManagerToken.Token;
         var orderViewerToken =
             accessTokenGenerator.Generate(
                 new AccessTokenUser(
@@ -161,6 +185,19 @@ public sealed partial class CatalogApiFixture : IAsyncLifetime
                         PermissionNames.Orders.View
                     ]));
 
+        var dashboardViewerToken =
+            accessTokenGenerator.Generate(
+                new AccessTokenUser(
+                    customerAdministrator.Id,
+                    customerAdministrator.Email!,
+                    customerAdministrator.FullName,
+                    [SystemRoles.Admin],
+                    [
+                        PermissionNames.Dashboard.View
+                    ]));
+
+        DashboardViewerAccessToken =
+            dashboardViewerToken.Token;
         OrderViewerAccessToken =
             orderViewerToken.Token;
 

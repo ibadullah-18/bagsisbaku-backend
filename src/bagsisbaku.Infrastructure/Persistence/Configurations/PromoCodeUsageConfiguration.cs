@@ -42,7 +42,7 @@ internal sealed class PromoCodeUsageConfiguration
 
         builder.Property(usage =>
                 usage.UsedAtUtc)
-            .HasPrecision(0)
+            .HasPrecision(7)
             .IsRequired();
 
         builder.HasIndex(usage =>

@@ -79,8 +79,16 @@ public sealed class PromoCodeUsage : Entity
 
         if (releasedAtUtc < UsedAtUtc)
         {
-            throw new DomainException(
-                "Promo kodun geri qaytarılma vaxtı istifadə vaxtından əvvəl ola bilməz.");
+            // Köhnə datetimeoffset(0) qeydləri saniyəyə
+            // yuvarlanmış ola bilər.
+            if (UsedAtUtc - releasedAtUtc >
+                TimeSpan.FromSeconds(1))
+            {
+                throw new DomainException(
+                    "Promo kodun geri qaytarılma vaxtı istifadə vaxtından əvvəl ola bilməz.");
+            }
+
+            releasedAtUtc = UsedAtUtc;
         }
 
         ReleasedAtUtc = releasedAtUtc;

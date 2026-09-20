@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using bagsisbaku.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using bagsisbaku.Infrastructure.Persistence;
 namespace bagsisbaku.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260920065412_FixPromoUsageTimestampPrecision")]
+    partial class FixPromoUsageTimestampPrecision
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -740,64 +743,6 @@ namespace bagsisbaku.Infrastructure.Persistence.Migrations
                     b.ToTable("customer_addresses", "customers");
                 });
 
-            modelBuilder.Entity("bagsisbaku.Domain.Engagement.SiteVisit", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedAtUtc")
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)");
-
-                    b.Property<string>("PagePath")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)");
-
-                    b.Property<Guid>("VisitorId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedAtUtc", "PagePath");
-
-                    b.HasIndex("VisitorId", "CreatedAtUtc");
-
-                    b.ToTable("site_visits", "engagement");
-                });
-
-            modelBuilder.Entity("bagsisbaku.Domain.Engagement.WhatsAppProductInquiry", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedAtUtc")
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)");
-
-                    b.Property<string>("ProductCode")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId", "CreatedAtUtc");
-
-                    b.ToTable("whatsapp_product_inquiries", "engagement");
-                });
-
             modelBuilder.Entity("bagsisbaku.Domain.Favorites.Favorite", b =>
                 {
                     b.Property<Guid>("Id")
@@ -828,92 +773,6 @@ namespace bagsisbaku.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("ux_favorites_user_product");
 
                     b.ToTable("favorites", "customers");
-                });
-
-            modelBuilder.Entity("bagsisbaku.Domain.Home.HomeSection", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedAtUtc")
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)");
-
-                    b.Property<string>("ImagePublicId")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("ImageUrl")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Subtitle")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("TargetUrl")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(160)
-                        .HasColumnType("nvarchar(160)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Type", "IsActive", "SortOrder");
-
-                    b.ToTable("home_sections", "home");
-                });
-
-            modelBuilder.Entity("bagsisbaku.Domain.Home.HomeSectionTranslation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedAtUtc")
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)");
-
-                    b.Property<Guid>("HomeSectionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Language")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Subtitle")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(160)
-                        .HasColumnType("nvarchar(160)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
-                        .HasPrecision(0)
-                        .HasColumnType("datetimeoffset(0)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HomeSectionId", "Language")
-                        .IsUnique();
-
-                    b.ToTable("home_section_translations", "home");
                 });
 
             modelBuilder.Entity("bagsisbaku.Domain.Orders.Order", b =>
@@ -1823,15 +1682,6 @@ namespace bagsisbaku.Infrastructure.Persistence.Migrations
                     b.HasOne("bagsisbaku.Infrastructure.Identity.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("bagsisbaku.Domain.Home.HomeSectionTranslation", b =>
-                {
-                    b.HasOne("bagsisbaku.Domain.Home.HomeSection", null)
-                        .WithMany()
-                        .HasForeignKey("HomeSectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
