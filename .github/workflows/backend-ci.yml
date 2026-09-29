@@ -1,0 +1,59 @@
+name: bagsisbaku backend ci
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bagsisbaku-backend-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test-docker:
+    name: Build, test and Docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Display .NET information
+        run: dotnet --info
+
+      - name: Restore
+        run: dotnet restore ./bagsisbaku.slnx
+
+      - name: Release build
+        run: >
+          dotnet build
+          ./bagsisbaku.slnx
+          --configuration Release
+          --no-restore
+
+      - name: Run tests
+        run: >
+          dotnet test
+          --solution ./bagsisbaku.slnx
+          --configuration Release
+          --no-build
+
+      - name: Build production Docker image
+        run: >
+          docker build
+          --file ./Dockerfile
+          --tag bagsisbaku-api:${{ github.sha }}
+          .
