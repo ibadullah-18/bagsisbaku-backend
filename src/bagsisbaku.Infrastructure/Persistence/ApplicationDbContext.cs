@@ -1,4 +1,5 @@
 using bagsisbaku.Application.Abstractions.Persistence;
+using bagsisbaku.Domain.Announcements;
 using bagsisbaku.Domain.Baskets;
 using bagsisbaku.Domain.Catalog;
 using bagsisbaku.Domain.Orders;
@@ -20,6 +21,13 @@ public sealed class ApplicationDbContext(
     : IdentityDbContext<AppUser, AppRole, Guid>(options),
       IUnitOfWork
 {
+    public DbSet<EmailAnnouncement>
+        EmailAnnouncements =>
+            Set<EmailAnnouncement>();
+
+    public DbSet<EmailAnnouncementRecipient>
+        EmailAnnouncementRecipients =>
+            Set<EmailAnnouncementRecipient>();
     public DbSet<Product> Products => Set<Product>();
 
     public DbSet<ProductImage> ProductImages =>

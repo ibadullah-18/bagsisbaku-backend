@@ -13,6 +13,7 @@ using bagsisbaku.Infrastructure.Customers.Administration;
 using bagsisbaku.Infrastructure.Administration.Admins;
 using bagsisbaku.Infrastructure.Authentication;
 using bagsisbaku.Infrastructure.Authorization;
+using bagsisbaku.Infrastructure.Announcements;
 using bagsisbaku.Infrastructure.Email;
 using bagsisbaku.Infrastructure.Identity;
 using bagsisbaku.Infrastructure.Storage;
@@ -81,6 +82,29 @@ var smtpEmailSettings =
 
 builder.Services.AddEmailDelivery(
     smtpEmailSettings);
+var emailAnnouncementSettings =
+    new EmailAnnouncementSettings(
+        builder.Configuration.GetValue<bool?>(
+            "EmailAnnouncements:DemoMode")
+            ?? false,
+
+        builder.Configuration[
+            "EmailAnnouncements:DemoRecipientEmail"],
+
+        builder.Configuration.GetValue<int?>(
+            "EmailAnnouncements:BatchSize")
+            ?? 10,
+
+        builder.Configuration.GetValue<bool?>(
+            "EmailAnnouncements:ProcessingEnabled")
+            ?? false,
+
+        builder.Configuration.GetValue<int?>(
+            "EmailAnnouncements:ProcessingIntervalSeconds")
+            ?? 10);
+
+builder.Services.AddEmailAnnouncements(
+    emailAnnouncementSettings);
 var frontendBaseUrl =
     builder.Configuration[
         "Frontend:BaseUrl"]

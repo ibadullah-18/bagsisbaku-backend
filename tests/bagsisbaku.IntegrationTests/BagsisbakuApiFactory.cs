@@ -1,7 +1,11 @@
-﻿using System.Text;
+using System.Text;
+using bagsisbaku.Application.Abstractions.Email;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 namespace bagsisbaku.IntegrationTests;
@@ -52,7 +56,19 @@ internal sealed class BagsisbakuApiFactory
                             "15",
 
                         ["Jwt:RefreshTokenDays"] =
-                            "30"
+                            "30",
+
+                        ["EmailAnnouncements:DemoMode"] =
+                            "false",
+
+                        ["EmailAnnouncements:BatchSize"] =
+                            "10",
+
+                        ["EmailAnnouncements:ProcessingEnabled"] =
+                            "false",
+
+                        ["EmailAnnouncements:ProcessingIntervalSeconds"] =
+                            "10"
                     });
             });
 
@@ -62,6 +78,23 @@ internal sealed class BagsisbakuApiFactory
     protected override void ConfigureWebHost(
         IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
+        builder.UseEnvironment(
+            "Testing");
+
+        builder.ConfigureTestServices(
+            services =>
+            {
+                services.RemoveAll<IEmailSender>();
+                services.RemoveAll<TestEmailSender>();
+
+                services.AddSingleton<
+                    TestEmailSender>();
+
+                services.AddSingleton<IEmailSender>(
+                    serviceProvider =>
+                        serviceProvider
+                            .GetRequiredService<
+                                TestEmailSender>());
+            });
     }
 }
