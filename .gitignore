@@ -13,3 +13,8 @@ artifacts/
 .env.*
 !.env.example
 appsettings.Development.json
+
+.env
+.env.production
+.env.*.local
+!.env.production.example

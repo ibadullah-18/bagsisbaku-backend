@@ -1,0 +1,139 @@
+name: bagsisbaku
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: bagsisbaku-sqlserver
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+      MSSQL_SA_PASSWORD: "${DB_SA_PASSWORD}"
+    volumes:
+      - bagsisbaku-sql-data:/var/opt/mssql
+    networks:
+      - bagsisbaku-network
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bagsisbaku-api:latest
+    container_name: bagsisbaku-migrate
+    restart: "no"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=bagsisbaku;User Id=sa;Password=${DB_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True"
+
+      Jwt__Issuer: "${JWT_ISSUER}"
+      Jwt__Audience: "${JWT_AUDIENCE}"
+      Jwt__SigningKey: "${JWT_SIGNING_KEY}"
+      Jwt__AccessTokenMinutes: "${JWT_ACCESS_TOKEN_MINUTES}"
+      Jwt__RefreshTokenDays: "${JWT_REFRESH_TOKEN_DAYS}"
+
+      Cloudinary__CloudName: "${CLOUDINARY_CLOUD_NAME}"
+      Cloudinary__ApiKey: "${CLOUDINARY_API_KEY}"
+      Cloudinary__ApiSecret: "${CLOUDINARY_API_SECRET}"
+
+      Email__Smtp__Host: "${SMTP_HOST}"
+      Email__Smtp__Port: "${SMTP_PORT}"
+      Email__Smtp__Username: "${SMTP_USERNAME}"
+      Email__Smtp__Password: "${SMTP_PASSWORD}"
+      Email__Smtp__FromEmail: "${SMTP_FROM_EMAIL}"
+      Email__Smtp__FromName: "${SMTP_FROM_NAME}"
+
+      Frontend__BaseUrl: "${FRONTEND_BASE_URL}"
+
+      Bootstrap__Identity__Enabled: "false"
+
+      EmailAnnouncements__DemoMode: "false"
+      EmailAnnouncements__BatchSize: "${EMAIL_ANNOUNCEMENTS_BATCH_SIZE}"
+      EmailAnnouncements__ProcessingEnabled: "false"
+      EmailAnnouncements__ProcessingIntervalSeconds: "${EMAIL_ANNOUNCEMENTS_INTERVAL_SECONDS}"
+    entrypoint:
+      - ./bagsisbaku-migrate
+    networks:
+      - bagsisbaku-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bagsisbaku-api:latest
+    container_name: bagsisbaku-api
+    restart: unless-stopped
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ASPNETCORE_URLS: "http://+:8080"
+
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=bagsisbaku;User Id=sa;Password=${DB_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True"
+
+      Jwt__Issuer: "${JWT_ISSUER}"
+      Jwt__Audience: "${JWT_AUDIENCE}"
+      Jwt__SigningKey: "${JWT_SIGNING_KEY}"
+      Jwt__AccessTokenMinutes: "${JWT_ACCESS_TOKEN_MINUTES}"
+      Jwt__RefreshTokenDays: "${JWT_REFRESH_TOKEN_DAYS}"
+
+      Cloudinary__CloudName: "${CLOUDINARY_CLOUD_NAME}"
+      Cloudinary__ApiKey: "${CLOUDINARY_API_KEY}"
+      Cloudinary__ApiSecret: "${CLOUDINARY_API_SECRET}"
+
+      Email__Smtp__Host: "${SMTP_HOST}"
+      Email__Smtp__Port: "${SMTP_PORT}"
+      Email__Smtp__Username: "${SMTP_USERNAME}"
+      Email__Smtp__Password: "${SMTP_PASSWORD}"
+      Email__Smtp__FromEmail: "${SMTP_FROM_EMAIL}"
+      Email__Smtp__FromName: "${SMTP_FROM_NAME}"
+
+      Frontend__BaseUrl: "${FRONTEND_BASE_URL}"
+
+      Bootstrap__Identity__Enabled: "${SUPERADMIN_BOOTSTRAP_ENABLED}"
+      Bootstrap__Identity__SuperAdmin__FullName: "${SUPERADMIN_FULL_NAME}"
+      Bootstrap__Identity__SuperAdmin__Email: "${SUPERADMIN_EMAIL}"
+      Bootstrap__Identity__SuperAdmin__Password: "${SUPERADMIN_PASSWORD}"
+
+      EmailAnnouncements__DemoMode: "${EMAIL_ANNOUNCEMENTS_DEMO_MODE}"
+      EmailAnnouncements__DemoRecipientEmail: "${EMAIL_ANNOUNCEMENTS_DEMO_RECIPIENT}"
+      EmailAnnouncements__BatchSize: "${EMAIL_ANNOUNCEMENTS_BATCH_SIZE}"
+      EmailAnnouncements__ProcessingEnabled: "${EMAIL_ANNOUNCEMENTS_PROCESSING_ENABLED}"
+      EmailAnnouncements__ProcessingIntervalSeconds: "${EMAIL_ANNOUNCEMENTS_INTERVAL_SECONDS}"
+    ports:
+      - "127.0.0.1:5213:8080"
+    networks:
+      - bagsisbaku-network
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail
+        - --silent
+        - http://localhost:8080/health
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+networks:
+  bagsisbaku-network:
+    name: bagsisbaku-network
+
+volumes:
+  bagsisbaku-sql-data:
+    name: bagsisbaku-sql-data
